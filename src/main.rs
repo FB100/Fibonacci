@@ -6,7 +6,6 @@ use std::panic;
 use std::time::{Duration, Instant};
 
 fn main() {
-
     for i in 20..27 {
         println!("Function 1:");
         let mut elapsed = Duration::from_secs(0);
@@ -62,7 +61,7 @@ fn test_helper(input: u64, expected_output: &str, fnb: fn(u64) -> Natural) {
         Err(mpsc::RecvTimeoutError::Timeout) => {
             panic!("Test took over 1 second with input={}", input);
         }
-        Err(e) => panic!("Worker-Thread-Fehler: {}", e),
+        Err(e) => panic!("Worker-Thread-Error: {}", e),
     }
 }
 
@@ -394,7 +393,7 @@ fn fast_doubling(n: u64) -> Natural {
         if n == 0 {
             return (Natural::from(0u8), Natural::from(1u8));
         }
-        let (mut a, b) = fib_pair(n >> 1);
+        let (a, b) = fib_pair(n >> 1);
         let mut c: Natural = (&b << 1) - &a;
         c.mul_assign(&a);
         let mut d = &a * &a;
@@ -451,14 +450,9 @@ fn optimized_fast_doubling_tail_recursive(n: u64) -> Natural {
             fib_pair(mask >> 1, n, d, c)
         }
     }
-    if n.is_power_of_two(){
-        fib_pair(
-            n,
-            n,
-            Natural::from(0u8),
-            Natural::from(1u8),
-        )
-    }else{
+    if n.is_power_of_two() {
+        fib_pair(n, n, Natural::from(0u8), Natural::from(1u8))
+    } else {
         fib_pair(
             n.next_power_of_two() >> 1,
             n,
@@ -490,7 +484,6 @@ fn optimized_fast_doubling_iterative(n: u64) -> Natural {
             let tmp_a = ((&b << 1) - &a) * &a;
             b = a.pow(2) + b.pow(2);
             a = tmp_a;
-
         } else {
             // Odd case
             let mut tmp_c: Natural = ((&b << 1) - &a) * &a;
